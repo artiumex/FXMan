@@ -66,7 +66,7 @@ app.post('/submitted', async function (req, res) {
     var snd = await sbtns.findOne({
         name: req.body.button
     });
-    uniPlay(snd.link, 50, false);
+    uniPlay(snd.link, 0.5, false);
     res.redirect('/');
 });
 
@@ -74,13 +74,13 @@ app.post('/louded', async function (req, res) {
     var snd = await sbtns.findOne({
         name: req.body.button
     });
-    uniPlay(snd.link, 100, false);
+    uniPlay(snd.link, 1, false);
     res.redirect('/loud');
 });
 
 app.post('/ttsed', function (req, res) {
     var textToSay = req.body.ttstext;
-    uniPlay(textToSay, 80, true);
+    uniPlay(textToSay, 0.5, true);
     res.redirect('/tts');
 });
 
@@ -185,7 +185,7 @@ client.on('message', async function(message) {
     if(command === 'say'){
         if (args.length > 1) {
             if (message.member.voice.channel){
-                uniPlay(args.join(' '), 80, true);
+                uniPlay(args.join(' '), 0.8, true);
             } else return message.channel.send('Join a voice channel first');
         } else return message.channel.send('Make it worth our while and use more then one word.');
     }
@@ -247,8 +247,6 @@ distube
 
 
 async function uniPlay(text, volume, istts){
-  let truVol = volume / 100; 
-  if (!truVol) truVol = 0.5; 
   if (!connection) {
       console.log('No connection');
       return;
