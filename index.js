@@ -36,6 +36,16 @@ app.get('/', async function (req, res) {
     });
 });
 
+app.get('/loud', async function (req, res) {
+    var connected = true;
+    if (!connection) connected = false;
+
+    res.render('loud', {
+        connected: connected,
+        buttons: await sbtns.find({}).sort({ name: -1 }),
+    });
+});
+
 app.get('/tts', function (req, res) {
     var connected = true;
     if (!connection) connected = false;
@@ -56,13 +66,21 @@ app.post('/submitted', async function (req, res) {
     var snd = await sbtns.findOne({
         name: req.body.button
     });
-    uniPlay(snd.link, false);
+    uniPlay(snd.link, 50, false);
     res.redirect('/');
+});
+
+app.post('/louded', async function (req, res) {
+    var snd = await sbtns.findOne({
+        name: req.body.button
+    });
+    uniPlay(snd.link, 100, false);
+    res.redirect('/loud');
 });
 
 app.post('/ttsed', function (req, res) {
     var textToSay = req.body.ttstext;
-    uniPlay(textToSay, true);
+    uniPlay(textToSay, 80, true);
     res.redirect('/tts');
 });
 
@@ -167,7 +185,7 @@ client.on('message', async function(message) {
     if(command === 'say'){
         if (args.length > 1) {
             if (message.member.voice.channel){
-                uniPlay(args.join(' '), true);
+                uniPlay(args.join(' '), 80, true);
             } else return message.channel.send('Join a voice channel first');
         } else return message.channel.send('Make it worth our while and use more then one word.');
     }
@@ -228,29 +246,31 @@ distube
     });
 
 
-async function uniPlay(text, istts){
-    if (!connection) {
-        console.log('No connection');
-        return;
-    }
-    var dispatcher;
+async function uniPlay(text, volume, istts){
+  let truVol = volume / 100; 
+  if (!truVol) truVol = 0.5; 
+  if (!connection) {
+      console.log('No connection');
+      return;
+  }
+  var dispatcher;
 
-    if (istts) {
-        console.log('Running TTS');
-        dispatcher = connection.play(discordTTS.getVoiceStream(text, {lang:"en"}));
-    }
-    else {
-        console.log('Running file');
-        dispatcher = connection.play(text, { volume: 0.5 });
-    }
+  if (istts) {
+      console.log('Running TTS');
+      dispatcher = connection.play(discordTTS.getVoiceStream(text, {lang:"en"}), { volume: truVol });
+  }
+  else {
+      console.log('Running file');
+      dispatcher = connection.play(text, { volume: truVol });
+  }
 
-    dispatcher.on('start', () => {
-        console.log(`"${text}" is now playing!`);
-    });
-    
-    dispatcher.on('finish', () => {
-        console.log(`"${text}" has finished playing!`);
-    });
-    
-    dispatcher.on('error', console.error);
+  dispatcher.on('start', () => {
+      console.log(`"${text}" is now playing!`);
+  });
+  
+  dispatcher.on('finish', () => {
+      console.log(`"${text}" has finished playing!`);
+  });
+  
+  dispatcher.on('error', console.error);
 }
