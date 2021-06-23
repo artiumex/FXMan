@@ -255,11 +255,11 @@ async function uniPlay(text, volume, istts){
 
   if (istts) {
       console.log('Running TTS');
-      dispatcher = connection.play(discordTTS.getVoiceStream(text, {lang:"en"}), { volume: truVol });
+      dispatcher = connection.play(discordTTS.getVoiceStream(text, {lang:"en"}), { volume: volume });
   }
   else {
       console.log('Running file');
-      dispatcher = connection.play(text, { volume: truVol });
+      dispatcher = connection.play(text, { volume: volume });
   }
 
   dispatcher.on('start', () => {
