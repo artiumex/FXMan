@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/head.ejs') %>
+</head>
+
+<body>
+    <%- include('partials/menu.ejs') %>
+    
+    <% if (!connected){ %>
+        <%- include('partials/no_connection.ejs'); %>
+    <% } else if(buttons.length > 0) { %>
+        <br><br>
+        <form action='/submitted' method='post'>
+            <% for(const btn of buttons){ %>
+                <input type='submit' id='<%= btn.name %>' name='button' value='<%= btn.name %>'><br><br>
+            <% } %>
+        </form>
+    <% } else { %>
+        <h1>No Buttons!</h1>
+        <p>Add some <a href='/buttons'>here</a>!</p>
+    <% } %>
+
+    <%- include('partials/footer.ejs') %>
+</body>
+
+</html>

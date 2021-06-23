@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/head.ejs') %>
+</head>
+
+<body>
+    <%- include('partials/menu.ejs') %>
+    
+    <h1>TTS - Make the bot say stuff!</h1>
+
+    <% if (connected){ %>
+        <form action='/ttsed' method='post'>
+            <input type='text' id='ttstext' name='ttstext' required>
+            <input type='submit' value='Submit'>
+        </form>
+    <% } else { %>
+        <%- include('partials/no_connection.ejs'); %>
+    <% } %>
+
+    <%- include('partials/footer.ejs') %>
+</body>
+
+</html>

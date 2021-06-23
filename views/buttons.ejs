@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/head.ejs') %>
+</head>
+
+<body>
+    <%- include('partials/menu.ejs') %>
+    
+    <h1>Add Buttons</h1>
+
+    <form id='addform' action='/added' method='post'>
+        <label for="buttonname">New Button Name:</label>
+        <input type='text' id='buttonname' name='buttonname' required><br><br>
+
+        <label for="buttonlink">New Button Link (mp3):</label><br><br>
+        <input type='text' id='buttonlink' name='buttonlink' required><br><br>
+
+        <input type='submit' value='Submit'>
+    </form>
+
+    <% if (buttons.length > 0){ %>
+        <h1>Remove Buttons</h1>
+
+        <form id='rmvform' action='/removed' method='post'>
+            <label for="buttonchoice">Choose a button to remove:</label>
+            <select name="buttonchoice" id="buttonchoice" required>
+                <% for(const btn of buttons){ %>
+                    <option value="<%= btn.name %>"><%= btn.name %></option>
+                <% } %>
+            </select><br><br>
+            <input type='submit' value='Submit'><br><br>
+        </form>
+    <% } else { %>
+        <p>No buttons to remove!</p>
+    <% } %>
+
+    <%- include('partials/footer.ejs') %>
+</body>
+
+</html>
