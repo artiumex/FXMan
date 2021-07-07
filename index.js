@@ -7,14 +7,14 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const sbtns = require('./models/sounds');
 //discord
+const fs = require('fs');
 const discord = require('discord.js');
 const discordTTS = require('discord-tts');
 const client = new discord.Client();
 var connection;
-const DisTube = require('distube');
-const distube = new DisTube(client, { searchSongs: true, emitNewSongOnly: true });
 //other
 const config = require('./config.json');
+const lib = require('./lib.js');
 
 
 
@@ -148,102 +148,78 @@ const dbOptions = {
 
 
 //discord
+client.commands = new discord.Collection();
+client.cooldowns = new discord.Collection();
+
+const commandFolders = fs.readdirSync('./commands');
+
+for (const folder of commandFolders) {
+	const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+		const command = require(`./commands/${folder}/${file}`);
+		client.commands.set(command.name, command);
+	}
+}
+
 client.login(config.token);
 
 client.on('ready', () => {
     console.log('Online');
 });
 
+client.on('interaction', async function(interaction) {
+	console.log(interaction);
+})
+
 client.on('message', async function(message) {
     if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+		if (message.channel.type === 'dm') return;
 
-	const args = message.content.slice(config.prefix.length).trim().split(' ');
-	const command = args.shift().toLowerCase();
+	const args = message.content.slice(config.prefix.length).trim().split(/ +/);
+	const commandName = args.shift().toLowerCase();
 
-    if(config.bannedUsers.includes(message.author.id)) return message.reply('no.');
+	if(config.bannedUsers.includes(message.author.id)) return message.reply('no.');
 
-    if(command === 'log') console.log(args.join(' '));
+	if(commandName === 'join'){
+		if (message.member.voice.channel){
+				connection = await message.member.voice.channel.join();
+		} else return message.channel.send('Join a voice channel first');
+	}
 
-    if(command == 'sneak'){
-        if(parseInt(args[0])){
-            const channel = client.channels.cache.get(args[0]);
-            channel.join().then(connect => connection = connect);
-        }
-    }
+	else if(commandName == 'sneak'){
+			if(parseInt(args[0])){
+					const channel = client.channels.cache.get(args[0]);
+					channel.join().then(connect => connection = connect);
+			}
+	}
 
-    if(['leave','disconnect'].includes(command)){
-        connection.disconnect();
-        connection = undefined;
-    }
+	else if(['leave','disconnect'].includes(commandName)){
+			connection.disconnect();
+			connection = undefined;
+	}
 
-    if(command === 'join'){
-        if (message.member.voice.channel){
-            connection = await message.member.voice.channel.join();
-        } else return message.channel.send('Join a voice channel first');
-    }
+	else {
+		const command = client.commands.get(commandName);
+		if (!command) return;
 
-    if(command === 'say'){
-        if (args.length > 1) {
-            if (message.member.voice.channel){
-                uniPlay(args.join(' '), 0.8, true);
-            } else return message.channel.send('Join a voice channel first');
-        } else return message.channel.send('Make it worth our while and use more then one word.');
-    }
+		if (command.args && !args.length) {
+			let reply = `You didn't provide any arguments, ${message.author}!`;
 
-    if (command == "play")
-        distube.play(message, args.join(" "));
+			if (command.usage) {
+				reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+			}
 
-    if (["repeat", "loop"].includes(command))
-        distube.setRepeatMode(message, parseInt(args[0]));
+			return message.channel.send(reply);
+		}	
 
-    if (command == "stop") {
-        distube.stop(message);
-        message.channel.send("Stopped the music!");
-    }
-
-    if (command == "skip")
-        distube.skip(message);
-
-    if (command == "queue") {
-        let queue = distube.getQueue(message);
-        message.channel.send('Current queue:\n' + queue.songs.map((song, id) =>
-            `**${id + 1}**. ${song.name} - \`${song.formattedDuration}\``
-        ).slice(0, 10).join("\n"));
-    }
-
-    if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {
-        let filter = distube.setFilter(message, command);
-        message.channel.send("Current queue filter: " + (filter || "Off"));
-    }
+		try {
+			command.execute(message, args, client, lib);
+		} catch (error) {
+			console.error(error);
+			message.reply('there was an error trying to execute that command!');
+		}
+	}
 });
-
-const status = (queue) => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filter || "Off"}\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "All Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
-
-// DisTube event listeners, more in the documentation page
-distube
-    .on("playSong", (message, queue, song) => message.channel.send(
-        `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`
-    ))
-    .on("addSong", (message, queue, song) => message.channel.send(
-        `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`
-    ))
-    .on("playList", (message, queue, playlist, song) => message.channel.send(
-        `Play \`${playlist.name}\` playlist (${playlist.songs.length} songs).\nRequested by: ${song.user}\nNow playing \`${song.name}\` - \`${song.formattedDuration}\`\n${status(queue)}`
-    ))
-    .on("addList", (message, queue, playlist) => message.channel.send(
-        `Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`
-    ))
-    // DisTubeOptions.searchSongs = true
-    .on("searchResult", (message, result) => {
-        let i = 0;
-        message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);
-    })
-    // DisTubeOptions.searchSongs = true
-    .on("searchCancel", (message) => message.channel.send(`Searching canceled`))
-    .on("error", (message, e) => {
-        console.error(e)
-        message.channel.send("An error encountered: " + e);
-    });
 
 
 async function uniPlay(text, volume, istts){
