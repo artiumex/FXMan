@@ -167,60 +167,39 @@ client.on('ready', () => {
     console.log('Online');
 });
 
-client.on('interaction', async function(interaction) {
-	console.log(interaction);
-})
-
-client.on('message', async function(message) {
-    if (!message.content.startsWith(config.prefix) || message.author.bot) return;
-		if (message.channel.type === 'dm') return;
+client.on('message', message => {
+	if (!message.content.startsWith(config.prefix) || message.author.bot) return;
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/);
-	const commandName = args.shift().toLowerCase();
+	const command = args.shift().toLowerCase();
 
-	if(config.bannedUsers.includes(message.author.id)) return message.reply('no.');
+	if (!client.commands.has(command)) return;
 
-	if(commandName === 'join'){
-		if (message.member.voice.channel){
-				connection = await message.member.voice.channel.join();
-		} else return message.channel.send('Join a voice channel first');
-	}
+	if (command.args && !args.length) {
+		let reply = `You didn't provide any arguments, ${message.author}!`;
 
-	else if(commandName == 'sneak'){
-			if(parseInt(args[0])){
-					const channel = client.channels.cache.get(args[0]);
-					channel.join().then(connect => connection = connect);
-			}
-	}
-
-	else if(['leave','disconnect'].includes(commandName)){
-			connection.disconnect();
-			connection = undefined;
-	}
-
-	else {
-		const command = client.commands.get(commandName);
-		if (!command) return;
-
-		if (command.args && !args.length) {
-			let reply = `You didn't provide any arguments, ${message.author}!`;
-
-			if (command.usage) {
-				reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
-			}
-
-			return message.channel.send(reply);
-		}	
-
-		try {
-			command.execute(message, args, client, lib);
-		} catch (error) {
-			console.error(error);
-			message.reply('there was an error trying to execute that command!');
+		if (command.usage) {
+			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
+
+		return message.channel.send(reply);
+	}	
+
+	try {
+		client.commands.get(command).execute(message, args, client, lib, connectionFunc);
+	} catch (error) {
+		console.error(error);
+		message.reply('there was an error trying to execute that command!');
 	}
 });
 
+function connectionFunc(type, change){
+	if (!type) return connection;
+	if (type == 1){
+		if (!change) return console.log('no change');
+		connection = change;
+	}
+}
 
 async function uniPlay(text, volume, istts){
   if (!connection) {
