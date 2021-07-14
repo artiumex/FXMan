@@ -171,22 +171,23 @@ client.on('message', message => {
 	if (!message.content.startsWith(config.prefix) || message.author.bot) return;
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/);
-	const command = args.shift().toLowerCase();
+	const cmd = args.shift().toLowerCase();
+	const command = client.commands.get(cmd)
 
-	if (!client.commands.has(command)) return;
-
+	if (!client.commands.has(cmd)) return;
+	
 	if (command.args && !args.length) {
 		let reply = `You didn't provide any arguments, ${message.author}!`;
 
 		if (command.usage) {
-			reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+			reply += `\n\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 		}
 
 		return message.channel.send(reply);
 	}	
 
 	try {
-		client.commands.get(command).execute(message, args, client, lib, connectionFunc);
+		command.execute(message, args, client, lib, connectionFunc);
 	} catch (error) {
 		console.error(error);
 		message.reply('there was an error trying to execute that command!');

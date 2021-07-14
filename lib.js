@@ -1,6 +1,6 @@
 module.exports = {
 	footer() {
-		var footers = ["Ahaha pissbot's back baby!"];
+		var footers = ["Ahaha pissbot's back baby!", "42", "[PBOT SUPREMACY]"];
 		var rand = this.random(0,footers.length);
 		return footers[rand]
 	},
