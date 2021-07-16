@@ -23,10 +23,6 @@ module.exports = {
 			await themprofile.save();
 		} else return lib.reply(message, 'YO THIS BITCH DONT GOT THE MONEY');
 
-		const embed = new MessageEmbed()
-			.setColor(lib.Colors.rand())
-			.setDescription(`${message.author.username} gave ${mentioned.username} \$${wireamt}`);
-
-		message.channel.send(embed);
+		lib.reply(message, `${message.author.username} gave ${mentioned.username} \$${wireamt}`);
 	},
 };

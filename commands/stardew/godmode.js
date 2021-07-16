@@ -1,6 +1,6 @@
 module.exports = {
 	name: 'godmode',
-	description: 'Makes the mentioned person a god!',
+	description: 'Boosts the mentioned person!',
 	ownerOnly: true,
 	args: false,
 	async execute(message, args, client, lib) {

@@ -15,6 +15,7 @@ const client = new discord.Client();
 var connection;
 //other
 const config = require('./config.json');
+client.prefix = config.prefix;
 const lib = require('./lib.js');
 
 
@@ -112,9 +113,9 @@ app.post('/removed', async function (req, res) {
     res.redirect('/buttons');
 });
 
-/*app.listen(3000, function(err){
-    console.log('App listening on http://localhost:3000');
-});*/
+app.listen(3000, function(err){
+  console.log('App listening on http://localhost:3000');
+});
 
 
 
