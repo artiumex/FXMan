@@ -62,5 +62,30 @@ module.exports = {
 			.setDescription(texty);
 
 		message.channel.send(embed);
+	},
+	farm: {
+		parsnips: { time: 2, emoji: '<:Parsnip:865563927713808384>', names: ['parsnip', 'parsnips', 'p'] },
+		wheat: { time: 3, emoji: '<:Wheat:865563927781572618>', names: ['wheat', 'w'] },
+		corn: { time: 6, emoji: '<:Corn:865563927412867083>', names: ['corn', 'c'] },
+		beets: { time: 12, emoji: '<:Beet:865563927454023700>', names: ['beet', 'beets', 'b'] },
+		grapes: { time: 24, emoji: '<:Grape:865563927542890546>', names: ['grape', 'grapes', 'g'] },
+		emoji: {
+			chicken: '<:White_Chicken:865563927919067146>',
+			cow: '<:White_Cow:865563928414388235>',
+			egg: '<:Egg:865570697328721930>',
+			milk: '<:Milk:865570697330032670>',
+			hay: '<:Hay:865563927601086464>',
+			shippingbox: '<:ShippingBox:865563927785635840>',
+			silo: '<:Silo:865563929845825566>',
+			coop: '<:Coop:865563926539141141>',
+			barn: '<:Barn:865563925991129098>',
+		}
+	},
+	farmtime(crop, t){
+		let now = new Date();
+		var output = false;
+
+		if ((Number(now) > (Number(crop.harvest) + (t * 3600000)))) output = true;
+		return output
 	}
 }

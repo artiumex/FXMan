@@ -6,7 +6,7 @@ const schema = new mongoose.Schema({
 	balance: { type: Number, default: 0 },
 	spouse: { type: String, default: '0' },
 	farm: {
-		parsnip: {
+		parsnips: {
 			seeds: { type: Number, default: 1 },
 			silo: { type: Number, default: 0 },
 			harvest: { type: Date, default: new Date() }
@@ -33,13 +33,11 @@ const schema = new mongoose.Schema({
 		},
 	},
 	feed: { type: Number, default: 0 },
-	coop: {
-		unlocked: { type: Boolean, default: false },
+	animals: {
+		coopunlocked: { type: Boolean, default: false },
 		chickens: { type: Number, default: 1 },
-		eggs: { type: Number, default: 0 }
-	},
-	barn: {
-		unlocked: { type: Boolean, default: false },
+		eggs: { type: Number, default: 0 },
+		barnunlocked: { type: Boolean, default: false },
 		cows: { type: Number, default: 1 },
 		milk: { type: Number, default: 0 }
 	},
@@ -50,7 +48,7 @@ const schema = new mongoose.Schema({
 		wine: { type: Number, default: 0 },
 		mayo: { type: Number, default: 0 },
 		cheese: { type: Number, default: 0 }
-	}
+	},
 });
 
 module.exports = new mongoose.model('currency', schema);

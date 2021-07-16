@@ -17,10 +17,6 @@ module.exports = {
 		profile.balance += Number(args[0]);
 		await profile.save();
 
-		const embed = new MessageEmbed()
-			.setColor(lib.Colors.rand())
-			.setDescription(`${message.author.username} gave ${mentioned.username} \$${args[0]}`);
-
-		message.channel.send(embed);
+		lib.reply(message, `${message.author.username} gave ${mentioned.username} \$${args[0]}`);
 	},
 };
