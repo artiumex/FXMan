@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 //mongoose
 const mongoose = require('mongoose');
 const sbtns = require('./models/sounds');
+const currency = require('./models/currency');
 //discord
 const fs = require('fs');
 const discord = require('discord.js');
@@ -111,9 +112,9 @@ app.post('/removed', async function (req, res) {
     res.redirect('/buttons');
 });
 
-app.listen(3000, function(err){
+/*app.listen(3000, function(err){
     console.log('App listening on http://localhost:3000');
-});
+});*/
 
 
 
@@ -186,8 +187,10 @@ client.on('message', message => {
 		return message.channel.send(reply);
 	}	
 
+	if (command.ownerOnly && message.author.id !== '256880604359032832') return message.channel.send('no.')
+
 	try {
-		command.execute(message, args, client, lib, connectionFunc);
+		command.execute(message, args, client, lib, currency, connectionFunc);
 	} catch (error) {
 		console.error(error);
 		message.reply('there was an error trying to execute that command!');
