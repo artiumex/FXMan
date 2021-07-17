@@ -26,10 +26,22 @@ module.exports = {
 			.setTitle(`**${mentioned.username}'s Farm :heart:**`);
 
 		const { farm, animals, feed } = profile;
+		const breaktime = (hrs, past) => {
+			const total =(Date.parse(past) + (hrs * 3600000)) - Date.parse(new Date());
+			const seconds = Math.floor( (total/1000) % 60 );
+			const minutes = Math.floor( (total/1000/60) % 60 );
+			const hours = Math.floor( (total/(1000*60*60)) % 24 );
+			var text = '';
+			
+			if (hours) text = `${hours} hr, ${minutes} m`
+			else text = `${minutes} m, ${secondd} s`
+
+			return text
+		}
 		const farmtime = (crop, t) => {
 			var output = `${crop.seeds} ${t.emoji}`;
 			if (lib.farmtime(crop, t.time)) output += " [READY]";
-			else output += " [NOT READY]"
+			else output += ` [${breaktime(t.time, crop.harvest)}]`;
 			return output
 		}
 

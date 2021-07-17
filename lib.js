@@ -73,7 +73,7 @@ module.exports = {
 		wheat: { time: 3, emoji: '<:Wheat:865563927781572618>', names: ['wheat', 'w'] },
 		corn: { time: 6, emoji: '<:Corn:865563927412867083>', names: ['corn', 'c'] },
 		beets: { time: 12, emoji: '<:Beet:865563927454023700>', names: ['beet', 'beets', 'b'] },
-		grapes: { time: 24, emoji: '<:Grape:865563927542890546>', names: ['grape', 'grapes', 'g'] },
+		grapes: { time: 20, emoji: '<:Grape:865563927542890546>', names: ['grape', 'grapes', 'g'] },
 		emoji: {
 			chicken: '<:White_Chicken:865563927919067146>',
 			cow: '<:White_Cow:865563928414388235>',
@@ -90,7 +90,7 @@ module.exports = {
 		let now = new Date();
 		var output = false;
 
-		if ((Number(now) > (Number(crop.harvest) + (t * 3600000)))) output = true;
+		if ((Date.parse(now) > (Date.parse(crop.harvest) + (t * 3600000)))) output = true;
 		return output
-	}
+	},
 }
