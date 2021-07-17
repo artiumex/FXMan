@@ -1,16 +1,31 @@
+const data = {
+  "name": "farm",
+  "description": "Displays your farm",
+  "options": [
+    {
+      "type": 6,
+      "name": "mentioned",
+      "description": "Show someone else's farm",
+      "required": false
+    }
+  ]
+}
+
+const {MessageEmbed} = require('discord.js');
+
 module.exports = {
-	name: 'farm',
-	description: 'Farms your farm!',
-	args: false,
-	async execute(message, args, client, lib, currency) {
-		let mentioned = message.author;
-		if (message.mentions.users.first()) {
-			mentioned = message.mentions.users.first();
-			args.shift();
-		}
-		if (mentioned.bot) return lib.reply(message, lib.responses.isbot);
-		
-		const { farm, animals, feed } = await lib.checkProf(mentioned.id);
+	name: data.name,
+	data: data,
+	async execute(client, interaction, args, respond, followup, lib) {
+		respond(interaction, `Fetching farm....`);
+		let mentioned = interaction.member.user;
+		if (args) mentioned = await client.users.cache.get(args[0].value);
+
+		const profile = await lib.checkProf(mentioned.id);
+		const embed = lib.embed()
+			.setTitle(`**${mentioned.username}'s Farm :heart:**`);
+
+		const { farm, animals, feed } = profile;
 		const farmtime = (crop, t) => {
 			var output = `${crop.seeds} ${t.emoji}`;
 			if (lib.farmtime(crop, t.time)) output += " [READY]";
@@ -20,9 +35,7 @@ module.exports = {
 
 		var text = [], silo = [];
 		
-		if (animals.coopunlocked || animals.barnunlocked) silo.push(`Hay: ${feed} ${lib.farm.emoji.hay}`);
-		
-		text.push(`**${mentioned.username}'s Farm :heart:**`);
+		if ((animals.coopunlocked || animals.barnunlocked) && feed) silo.push(`Hay: ${feed} ${lib.farm.emoji.hay}`);
 		
 		text.push(`\n${lib.farm.emoji.shippingbox} *Crops*:`);
 		text.push(`Parsnips: ${farmtime(farm.parsnips, lib.farm.parsnips)}`);
@@ -51,20 +64,22 @@ module.exports = {
 		if (animals.coopunlocked){
 			text.push(`\n${lib.farm.emoji.coop} *Coop*`);
 			text.push(`Chickens: ${animals.chickens} ${lib.farm.emoji.chicken}`);
-			silo.push(`Eggs: ${animals.eggs} ${lib.farm.emoji.egg}`);
+			if (animals.eggs) silo.push(`Eggs: ${animals.eggs} ${lib.farm.emoji.egg}`);
 		}
 
 		if (animals.barnunlocked){
 			text.push(`\n${lib.farm.emoji.barn} *Barn*`);
 			text.push(`Cows: ${animals.cows} ${lib.farm.emoji.cow}`);
-			silo.push(`Milk: ${animals.milk} ${lib.farm.emoji.milk}`);
+			if (animals.milk) silo.push(`Milk: ${animals.milk} ${lib.farm.emoji.milk}`);
 		}
 
 		if (silo.length){
 			text.push(`\n${lib.farm.emoji.silo} *Silo*`);
 			text.push(silo.join('\n'));
 		} 
-		
-		lib.reply(message, text.join('\n'));
+
+		embed.setDescription(text.join('\n'));
+
+		followup(interaction, embed, true)
 	},
 };

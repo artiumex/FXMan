@@ -4,6 +4,7 @@ const discord = require('discord.js');
 
 module.exports = {
 	botid: '864589806276575262',
+	testGuilds: ['402919650985246741', '865562274953560064', '757018928391389224'],
 	Colors: {
 		red: '#ff0000',
 		black: '#000000',
@@ -56,12 +57,16 @@ module.exports = {
 			return newprof
 		} else return profile
 	},
-	reply (message, texty) {
+	reply(message, texty) {
 		const embed = new discord.MessageEmbed()
 			.setColor(this.Colors.rand())
 			.setDescription(texty);
 
 		message.channel.send(embed);
+	},
+	embed() {
+		const embed = new discord.MessageEmbed().setColor(this.Colors.rand());
+		return embed
 	},
 	farm: {
 		parsnips: { time: 2, emoji: '<:Parsnip:865563927713808384>', names: ['parsnip', 'parsnips', 'p'] },

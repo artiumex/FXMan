@@ -9,6 +9,7 @@ const sbtns = require('./models/sounds');
 const currency = require('./models/currency');
 //discord
 const fs = require('fs');
+const axios = require('axios').default;
 const discord = require('discord.js');
 const discordTTS = require('discord-tts');
 const client = new discord.Client();
@@ -19,6 +20,7 @@ client.prefix = config.prefix;
 const lib = require('./lib.js');
 
 
+process.on("unhandledRejection", error => console.log(error));
 
 
 //express
@@ -113,9 +115,9 @@ app.post('/removed', async function (req, res) {
     res.redirect('/buttons');
 });
 
-app.listen(3000, function(err){
+/*app.listen(3000, function(err){
   console.log('App listening on http://localhost:3000');
-});
+});*/
 
 
 
@@ -150,33 +152,73 @@ const dbOptions = {
 
 
 //discord
-client.commands = new discord.Collection();
-client.cooldowns = new discord.Collection();
+client.legacycommands = new discord.Collection();
+client.slashcommands = new discord.Collection();
 
-const commandFolders = fs.readdirSync('./commands');
+const lcommandFolders = fs.readdirSync('./commands');
+const scommandFolders = fs.readdirSync('./slash');
 
-for (const folder of commandFolders) {
+for (const folder of lcommandFolders) {
 	const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
 		const command = require(`./commands/${folder}/${file}`);
-		client.commands.set(command.name, command);
+		command.folder = folder;
+		client.legacycommands.set(command.name, command);
+	}
+}
+
+
+for (const folder of scommandFolders) {
+	const scommandFiles = fs.readdirSync(`./slash/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of scommandFiles) {
+		const command = require(`./slash/${folder}/${file}`);
+		command.folder = folder;
+		command.data.description = `[${folder}] ${command.data.description}`;
+		client.slashcommands.set(command.name, command);
 	}
 }
 
 client.login(config.token);
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log('Online');
+		for (const guild of lib.testGuilds){
+			for (const slashcmd of client.slashcommands){
+				const slash = slashcmd[1];
+				client.api.applications(client.user.id).guilds(guild).commands.post({data: slash.data});
+			}
+		}
 });
+
+client.ws.on('INTERACTION_CREATE', async interaction => {
+  const respond = (interaction, text) => {
+		client.api.interactions(interaction.id, interaction.token).callback.post({data: {
+			type: 4,
+			data: {
+				content: text,
+				ephemeral: true
+			}
+		}});
+	}
+	const followup = async (interaction, change, isembed) => {
+		if (isembed) axios.patch(`https://discord.com/api/v8/webhooks/${client.user.id}/${interaction.token}/messages/@original`, { content: '', embeds: [change] });
+		else axios.patch(`https://discord.com/api/v8/webhooks/${client.user.id}/${interaction.token}/messages/@original`, { content: change });
+	}
+	const command = client.slashcommands.get(interaction.data.name);
+	var args = interaction.data.options;
+	
+	if(!command) return respond('oops!');
+	command.execute(client, interaction, args, respond, followup, lib);
+})
 
 client.on('message', message => {
 	if (!message.content.startsWith(config.prefix) || message.author.bot) return;
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/);
 	const cmd = args.shift().toLowerCase();
-	const command = client.commands.get(cmd)
+	const command = client.legacycommands.get(cmd)
 
-	if (!client.commands.has(cmd)) return;
+	if (!client.legacycommands.has(cmd)) return;
 	
 	if (command.args && !args.length) {
 		let reply = `You didn't provide any arguments, ${message.author}!`;

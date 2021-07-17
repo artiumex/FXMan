@@ -1,10 +1,52 @@
+const data = {
+  "name": "harvest",
+  "description": "Harvests a crop!",
+  "options": [
+    {
+      "type": 3,
+      "name": "crop",
+      "description": "The crop you want to harvest.",
+      "required": true,
+      "choices": [
+        {
+          "name": "parsnips",
+          "value": "parsnips"
+        },
+        {
+          "name": "wheat",
+          "value": "wheat"
+        },
+        {
+          "name": "corn",
+          "value": "corn"
+        },
+        {
+          "name": "beets",
+          "value": "beets"
+        },
+        {
+          "name": "grapes",
+          "value": "grapes"
+        },
+        {
+          "name": "all",
+          "value": "all"
+        }
+      ]
+    }
+  ]
+}
+
+const {MessageEmbed} = require('discord.js');
+
 module.exports = {
-	name: 'harvest',
-	description: 'Harvests a crop!',
-	args: true,
-	usage: '<crop>',
-	async execute(message, args, client, lib, currency) {
-		let profile = await lib.checkProf(message.author.id);
+	name: data.name,
+	data: data,
+	async execute(client, interaction, args, respond, followup, lib) {
+		respond(interaction, `Fetching balance....`);
+		let self = interaction.member.user;
+
+		const profile = await lib.checkProf(self.id);
 		const { farm } = profile;
 		var text = [];
 		var changes = false;
@@ -53,22 +95,24 @@ module.exports = {
 				} else text.push('Could not harvest grapes!');
 			},
 		}
-		//if else chain
-		if (lib.farm.parsnips.names.includes(args[0])) stuff.p();
-		else if (lib.farm.wheat.names.includes(args[0])) stuff.w();
-		else if (lib.farm.corn.names.includes(args[0])) stuff.c();
-		else if (lib.farm.beets.names.includes(args[0])) stuff.b();
-		else if (lib.farm.grapes.names.includes(args[0])) stuff.g();
-		else if (['all', 'most'].includes(args[0])){
+		
+		if (args[0].value == 'parsnips') stuff.p();
+		else if (args[0].value == 'wheat') stuff.w();
+		else if (args[0].value == 'corn') stuff.c();
+		else if (args[0].value == 'beets') stuff.b();
+		else if (args[0].value == 'grapes') stuff.g();
+		else if (args[0].value == 'all'){
 			stuff.p();
 			stuff.w();
 			stuff.c();
 			stuff.b();
 			stuff.g();
 		}
-		else lib.reply(message, `what is *${args[0]}*? lol.`)
 
-		if (changes) profile.save();
-		lib.reply(message, text.join('\n'));
+		if (changes) await profile.save();
+
+		const embed = lib.embed()
+			.setDescription(text.join('\n'));
+		followup(interaction, embed, true)
 	},
 };
