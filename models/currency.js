@@ -34,12 +34,18 @@ const schema = new mongoose.Schema({
 	},
 	feed: { type: Number, default: 0 },
 	animals: {
-		coopunlocked: { type: Boolean, default: false },
-		chickens: { type: Number, default: 1 },
-		eggs: { type: Number, default: 0 },
-		barnunlocked: { type: Boolean, default: false },
-		cows: { type: Number, default: 1 },
-		milk: { type: Number, default: 0 }
+		chickens: {
+			building: { type: Boolean, default: false },
+			amount: { type: Number, default: 1 },
+			pet: { type: Date, default: new Date() },
+			product: { type: Number, default: 0 }
+		},
+		cows: {
+			building: { type: Boolean, default: false },
+			amount: { type: Number, default: 1 },
+			pet: { type: Date, default: new Date() },
+			product: { type: Number, default: 0 }
+		},
 	},
 	artisan: {
 		flour: { type: Number, default: 0 },

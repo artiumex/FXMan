@@ -23,74 +23,67 @@ module.exports = {
 
 		const profile = await lib.checkProf(mentioned.id);
 		const embed = lib.embed()
-			.setTitle(`**${mentioned.username}'s Farm :heart:**`);
+			.setTitle(`**${mentioned.username}'s Farm** ${lib.emoji.heart}`)
+			.setDescription('Your Little Farm \<3');
 
-		const { farm, animals, feed } = profile;
-		const breaktime = (hrs, past) => {
-			const total =(Date.parse(past) + (hrs * 3600000)) - Date.parse(new Date());
-			const seconds = Math.floor( (total/1000) % 60 );
-			const minutes = Math.floor( (total/1000/60) % 60 );
-			const hours = Math.floor( (total/(1000*60*60)) % 24 );
-			var text = '';
-			
-			if (hours) text = `${hours} hr, ${minutes} m`
-			else text = `${minutes} m, ${secondd} s`
-
-			return text
+		const { farm, feed, animals } = profile;
+		
+		const farmtime = (cropprof, cropdata) => {
+			var output = `${cropprof.seeds} ${cropdata.emoji} `;
+			if (lib.time(cropprof.harvest, cropdata.time)) output += "[READY]";
+			else output += `[${lib.breaktime(cropdata.time, cropprof.harvest)}]`;
+			return output
 		}
-		const farmtime = (crop, t) => {
-			var output = `${crop.seeds} ${t.emoji}`;
-			if (lib.farmtime(crop, t.time)) output += " [READY]";
-			else output += ` [${breaktime(t.time, crop.harvest)}]`;
+		const pettime = (animalprof, animaldata) => {
+			var output = `${animalprof.amount} ${animaldata.emoji} `;
+			if (lib.time(animalprof.pet, animaldata.time)) output += "[READY]";
+			else output += `[${lib.breaktime(animaldata.time, animalprof.pet)}]`;
 			return output
 		}
 
-		var text = [], silo = [];
+		var croptext = [], silotext = [], cooptext = [], barntext = [], invtext = [];
 		
-		if ((animals.coopunlocked || animals.barnunlocked) && feed) silo.push(`Hay: ${feed} ${lib.farm.emoji.hay}`);
+		if ((animals.chickens.buildng || animals.cows.building) && feed) silotext.push(`Hay: ${feed} ${lib.emoji.hay}`);
+
+		croptext.push(`Parsnips: ${farmtime(farm.parsnips, lib.farm.parsnips)}`);
+		if (farm.parsnips.silo) silotext.push(`Parsnips: ${farm.parsnips.silo} ${lib.farm.parsnips.emoji}`);
 		
-		text.push(`\n${lib.farm.emoji.shippingbox} *Crops*:`);
-		text.push(`Parsnips: ${farmtime(farm.parsnips, lib.farm.parsnips)}`);
-		if (farm.parsnips.silo) silo.push(`Parsnips: ${farm.parsnips.silo} ${lib.farm.parsnips.emoji}`);
-		
-		if (farm.wheat.seeds) {
-			text.push(`Wheat: ${farmtime(farm.wheat, lib.farm.wheat)}`);
-			silo.push(`Wheat: ${farm.wheat.silo} ${lib.farm.wheat.emoji}`);
+		if (farm.wheat.seeds) croptext.push(`Wheat: ${farmtime(farm.wheat, lib.farm.wheat)}`);
+		if (farm.wheat.silo) silotext.push(`Wheat: ${farm.wheat.silo} ${lib.farm.wheat.emoji}`);
+
+		if (farm.corn.seeds) croptext.push(`Corn: ${farmtime(farm.corn, lib.farm.corn)}`);
+		if (farm.corn.silo) silotext.push(`Corn: ${farm.corn.silo} ${lib.farm.corn.emoji}`);
+
+		if (farm.beets.seeds) croptext.push(`Beets: ${farmtime(farm.beets, lib.farm.beets)}`);
+		if (farm.beets.silo) silotext.push(`Beets: ${farm.beets.silo} ${lib.farm.beets.emoji}`);
+
+		if (farm.grapes.seeds) croptext.push(`Grapes: ${farmtime(farm.grapes, lib.farm.grapes)}`);
+		if (farm.grapes.silo) silotext.push(`Grapes: ${farm.grapes.silo} ${lib.farm.grapes.emoji}`);
+
+		embed.addField(`\n${lib.emoji.shippingbox} Crops:`,croptext.join('\n'));
+
+		if (animals.chickens.building){
+			cooptext.push(`Chickens: ${pettime(animals.chickens, lib.animals.chickens)}`);
+			if (animals.chickens.product) cooptext.push(`Eggs: ${animals.chickens.product} ${lib.animals.chickens.pemoji}`);
+			embed.addField(`\n${lib.emoji.coop} Coop`, cooptext.join('\n'));
 		}
 
-		if (farm.corn.seeds) {
-			text.push(`Corn: ${farmtime(farm.corn, lib.farm.corn)}`);
-			silo.push(`Corn: ${farm.corn.silo} ${lib.farm.corn.emoji}`);
+		if (animals.cows.building){
+			barntext.push(`Cows: ${pettime(animals.cows, lib.animals.cows)}`);
+			if (animals.cows.product) barntext.push(`Milk: ${animals.cows.product} ${lib.animals.cows.pemoji}`);
+			embed.addField(`\n${lib.emoji.barn} Barn`, barntext.join('\n'));
 		}
 
-		if (farm.beets.seeds) {
-			text.push(`Beets: ${farmtime(farm.beets, lib.farm.beets)}`);
-			silo.push(`Beets: ${farm.beets.silo} ${lib.farm.beets.emoji}`);
-		}
+		if (silotext.length) embed.addField(`${lib.emoji.silo} Silo`,silotext.join('\n'));
 
-		if (farm.grapes.seeds) {
-			text.push(`Grapes: ${farmtime(farm.grapes, lib.farm.grapes)}`);
-			silo.push(`Grapes: ${farm.grapes.silo} ${lib.farm.grapes.emoji}`);
-		}
+		if (profile.artisan.flour) invtext.push(`Flour: ${profile.artisan.flour} ${lib.artisan.flour.emoji}`);
+		if (profile.artisan.oil) invtext.push(`Oil: ${profile.artisan.oil} ${lib.artisan.oil.emoji}`);
+		if (profile.artisan.sugar) invtext.push(`Sugar: ${profile.artisan.sugar} ${lib.artisan.sugar.emoji}`);
+		if (profile.artisan.wine) invtext.push(`Wine: ${profile.artisan.wine} ${lib.artisan.wine.emoji}`);
+		if (profile.artisan.mayo) invtext.push(`Mayo: ${profile.artisan.mayo} ${lib.artisan.mayo.emoji}`);
+		if (profile.artisan.cheese) invtext.push(`Cheese: ${profile.artisan.cheese} ${lib.artisan.cheese.emoji}`);
 
-		if (animals.coopunlocked){
-			text.push(`\n${lib.farm.emoji.coop} *Coop*`);
-			text.push(`Chickens: ${animals.chickens} ${lib.farm.emoji.chicken}`);
-			if (animals.eggs) silo.push(`Eggs: ${animals.eggs} ${lib.farm.emoji.egg}`);
-		}
-
-		if (animals.barnunlocked){
-			text.push(`\n${lib.farm.emoji.barn} *Barn*`);
-			text.push(`Cows: ${animals.cows} ${lib.farm.emoji.cow}`);
-			if (animals.milk) silo.push(`Milk: ${animals.milk} ${lib.farm.emoji.milk}`);
-		}
-
-		if (silo.length){
-			text.push(`\n${lib.farm.emoji.silo} *Silo*`);
-			text.push(silo.join('\n'));
-		} 
-
-		embed.setDescription(text.join('\n'));
+		if (invtext.length) embed.addField(`${lib.emoji.backpack} Inventory`,invtext.join('\n'));
 
 		followup(interaction, embed, true)
 	},

@@ -68,29 +68,51 @@ module.exports = {
 		const embed = new discord.MessageEmbed().setColor(this.Colors.rand());
 		return embed
 	},
-	farm: {
-		parsnips: { time: 2, emoji: '<:Parsnip:865563927713808384>', names: ['parsnip', 'parsnips', 'p'] },
-		wheat: { time: 3, emoji: '<:Wheat:865563927781572618>', names: ['wheat', 'w'] },
-		corn: { time: 6, emoji: '<:Corn:865563927412867083>', names: ['corn', 'c'] },
-		beets: { time: 12, emoji: '<:Beet:865563927454023700>', names: ['beet', 'beets', 'b'] },
-		grapes: { time: 20, emoji: '<:Grape:865563927542890546>', names: ['grape', 'grapes', 'g'] },
-		emoji: {
-			chicken: '<:White_Chicken:865563927919067146>',
-			cow: '<:White_Cow:865563928414388235>',
-			egg: '<:Egg:865570697328721930>',
-			milk: '<:Milk:865570697330032670>',
-			hay: '<:Hay:865563927601086464>',
-			shippingbox: '<:ShippingBox:865563927785635840>',
-			silo: '<:Silo:865563929845825566>',
-			coop: '<:Coop:865563926539141141>',
-			barn: '<:Barn:865563925991129098>',
-		}
+	emoji: {
+		heart: ':heart:',
+		hay: '<:Hay:865563927601086464>',
+		shippingbox: '<:ShippingBox:865563927785635840>',
+		silo: '<:Silo:865563929845825566>',
+		coop: '<:Coop:865563926539141141>',
+		barn: '<:Barn:865563925991129098>',
+		backpack: '<:Backpack:866144836545544192>',
 	},
-	farmtime(crop, t){
+	farm: {
+		parsnips: { time: 2, emoji: '<:Parsnip:865563927713808384>' },
+		wheat: { time: 3, emoji: '<:Wheat:865563927781572618>' },
+		corn: { time: 6, emoji: '<:Corn:865563927412867083>' },
+		beets: { time: 12, emoji: '<:Beet:865563927454023700>' },
+		grapes: { time: 20, emoji: '<:Grape:865563927542890546>' },
+	},
+	animals: {
+		chickens: { time: 6, emoji: '<:White_Chicken:865563927919067146>', pemoji: '<:Egg:865570697328721930>' },
+		cows: { time: 8, emoji: '<:White_Cow:865563928414388235>', pemoji: '<:Milk:865570697330032670>' },
+	},
+	artisan: {
+		flour: { emoji: '<:Wheat_Flour:866144836436099102>' },
+		oil: { emoji: '<:Oil:866144836154294292>' },
+		sugar: { emoji: '<:Sugar:866144837228560384>' },
+		wine: { emoji: '<:Wine:866144836473716786>' },
+		mayo: { emoji: '<:Mayonnaise:866144836247093248>' },
+		cheese: { emoji: '<:Cheese:866144836330848266>' },
+	},
+	time(dur, hrs){
 		let now = new Date();
 		var output = false;
 
-		if ((Date.parse(now) > (Date.parse(crop.harvest) + (t * 3600000)))) output = true;
+		if ((Date.parse(now) > (Date.parse(dur) + (hrs * 3600000)))) output = true;
 		return output
 	},
+	breaktime (hrs, past) {
+		const total =(Date.parse(past) + (hrs * 3600000)) - Date.parse(new Date());
+		const seconds = Math.floor( (total/1000) % 60 );
+		const minutes = Math.floor( (total/1000/60) % 60 );
+		const hours = Math.floor( (total/(1000*60*60)) % 24 );
+		var text = '';
+		
+		if (hours) text = `${hours} hr, ${minutes} m`
+		else text = `${minutes} m, ${seconds} s`
+
+		return text
+	}
 }

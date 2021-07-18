@@ -15,10 +15,12 @@ module.exports = {
 
 		balance += 10000000;
 		profile.feed += 1000;
-		animals.coopunlocked = true;
-		animals.barnunlocked = true;
-		animals.chickens += 5;
-		animals.cows += 5;
+		animals.chickens.building = true;
+		animals.chickens.amount += 5;
+		animals.chickens.pet = timetravel;
+		animals.cows.building = true;
+		animals.cows.amount += 5;
+		animals.cows.pet = timetravel;
 		farm.parsnips.seeds += 100;
 		farm.parsnips.harvest = timetravel;
 		farm.wheat.seeds += 100;

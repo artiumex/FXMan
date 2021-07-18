@@ -43,7 +43,7 @@ module.exports = {
 	name: data.name,
 	data: data,
 	async execute(client, interaction, args, respond, followup, lib) {
-		respond(interaction, `Fetching balance....`);
+		respond(interaction, `Fetching crops....`);
 		let self = interaction.member.user;
 
 		const profile = await lib.checkProf(self.id);
@@ -52,7 +52,7 @@ module.exports = {
 		var changes = false;
 		var stuff = {
 			p() {
-				if (lib.farmtime(farm.parsnips, lib.farm.parsnips.time)){
+				if (lib.time(farm.parsnips.harvest, lib.farm.parsnips.time)){
 					farm.parsnips.silo += farm.parsnips.seeds;
 					farm.parsnips.harvest = new Date();
 					changes = true;
@@ -60,7 +60,7 @@ module.exports = {
 				} else text.push('Could not harvest parsnips!');
 			},
 			w() {
-				if (lib.farmtime(farm.wheat, lib.farm.wheat.time)){
+				if (lib.time(farm.wheat.harvest, lib.farm.wheat.time)){
 					farm.wheat.silo += farm.wheat.seeds;
 					farm.wheat.harvest = new Date();
 					const wheatadd = Math.floor(Math.random() * farm.wheat.seeds);
@@ -71,7 +71,7 @@ module.exports = {
 				} else text.push('Could not harvest wheat!');
 			},
 			c() {
-				if (lib.farmtime(farm.corn, lib.farm.corn.time)){
+				if (lib.time(farm.corn.harvest, lib.farm.corn.time)){
 					farm.corn.silo += farm.corn.seeds;
 					farm.corn.harvest = new Date();
 					changes = true;
@@ -79,7 +79,7 @@ module.exports = {
 				} else text.push('Could not harvest corn!');
 			},
 			b() {
-				if (lib.farmtime(farm.beets, lib.farm.beets.time)){
+				if (lib.time(farm.beets.harvest, lib.farm.beets.time)){
 					farm.beets.silo += farm.beets.seeds;
 					farm.beets.harvest = new Date();
 					changes = true;
@@ -87,7 +87,7 @@ module.exports = {
 				} else text.push('Could not harvest beets!');
 			},
 			g() {
-				if (lib.farmtime(farm.grapes, lib.farm.grapes.time)){
+				if (lib.time(farm.grapes.harvest, lib.farm.grapes.time)){
 					farm.grapes.silo += farm.grapes.seeds;
 					farm.grapes.harvest = new Date();
 					changes = true;
