@@ -30,6 +30,6 @@ module.exports = {
 			)
 			.setTimestamp()
 			.setFooter(lib.footer());
-
+			message.channel.send(embed);
 	},
 };
