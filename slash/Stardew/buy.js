@@ -53,7 +53,7 @@ module.exports = {
 		
 		const runthrough = async (buycost, buything) => {
 			let amt = amount.value;
-			if (0 > amt || (buycost * amt) > profile.blalance) amt = Math.floor(profile.balance / buycost);
+			if (0 > amt || (buycost * amt) > profile.balance) amt = Math.floor(profile.balance / buycost);
 			profile.balance -= buycost * amt;
 			buything(amt);
 			await profile.save();
