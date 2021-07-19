@@ -67,7 +67,7 @@ module.exports = {
 					profile.feed += wheatadd;
 					changes = true;
 					text.push(`Harvested wheat! You now have ${farm.wheat.silo} ${lib.farm.wheat.emoji}`);
-					if (wheatadd) text.push(`Collected hay! You now have ${profile.feed} ${lib.farm.emoji.hay}`);
+					if (wheatadd) text.push(`Collected hay! You now have ${profile.feed} ${lib.emoji.hay}`);
 				} else text.push('Could not harvest wheat!');
 			},
 			c() {
