@@ -19,7 +19,7 @@ module.exports = {
 			lib.reply(message, `Bought ${item.value}! Your balance is now: \$${profile.balance}`);
 		}
 
-		if (!args) {
+		if (!args.length) {
 			var text = [];
 			const embed = lib.embed().setTitle(`Town Agricultural Market ${lib.emoji.heart}`);
 			var allBought = true;
@@ -33,8 +33,9 @@ module.exports = {
 			}
 			if (allBought) text = ['You have everything you need!'];
 			embed.setDescription(text);
-			message.channel.send(embed);
+			return message.channel.send(embed);
 		} else {
+			console.log(args);
 			let item = args[0];
 			if (item == 'coop') runthrough(costs.coop, () => profile.animals.chickens.building = true);
 			else if (item == 'barn') runthrough(costs.barn, () => profile.animals.cows.building = true);
