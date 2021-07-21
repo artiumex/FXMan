@@ -12,11 +12,13 @@ module.exports = {
 		}
 
 		const runthrough = async (buycost, buything) => {
+			let amt = Number(args[1]);
+			if (!Number(args[1])) return lib.reply(message,'please provide an amount!');
 			if (profile.balance < buycost) return lib.reply(message, `You dont have enough money to buy that!`);
 			profile.balance -= buycost * amt;
 			buything();
 			await profile.save();
-			lib.reply(message, `Bought ${item.value}! Your balance is now: \$${profile.balance}`);
+			lib.reply(message, `Bought ${args[0]}! Your balance is now: \$${profile.balance}`);
 		}
 
 		if (!args.length) {
@@ -35,7 +37,6 @@ module.exports = {
 			embed.setDescription(text);
 			return message.channel.send(embed);
 		} else {
-			console.log(args);
 			let item = args[0];
 			if (item == 'coop') runthrough(costs.coop, () => profile.animals.chickens.building = true);
 			else if (item == 'barn') runthrough(costs.barn, () => profile.animals.cows.building = true);
