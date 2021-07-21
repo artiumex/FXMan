@@ -1,7 +1,7 @@
 module.exports = {
 	name: 'buy',
 	description: 'One-Time purchases for your farm!',
-	args: true,
+	args: false,
 	async execute(message, args, client, lib) {
 		let profile = await lib.checkProf(message.author.id);
 		let { balance, farm, animals } = profile;
