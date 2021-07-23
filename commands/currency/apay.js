@@ -12,10 +12,10 @@ module.exports = {
 		if (mentioned.bot) return lib.reply(message, lib.responses.isbot);
 		let profile = await lib.checkProf(mentioned.id);
 		
-		let amount = args[0];
-		if (!Number(amount)) return lib.reply(message,'NO!');
+		let amount = lib.baleval(args[0],profile);
+		if (!amount) return lib.reply(message,'NO!');
 
-		profile.balance += Number(amount);
+		profile.balance += amount;
 
 		profile.save()
 			.then(lib.reply(message, `THe moniES is now: \$${profile.balance}`));

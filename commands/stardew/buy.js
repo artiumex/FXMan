@@ -1,46 +1,43 @@
 module.exports = {
 	name: 'buy',
-	description: 'One-Time purchases for your farm!',
+	description: 'Buys stuff for your farm!',
 	args: false,
 	async execute(message, args, client, lib) {
 		let profile = await lib.checkProf(message.author.id);
-		let { balance, farm, animals } = profile;
 
-		const costs = {
-			coop: 4400 ,
-			barn: 6500,
-		}
-
-		const runthrough = async (buycost, buything) => {
-			let amt = Number(args[1]);
-			if (!Number(args[1])) return lib.reply(message,'please provide an amount!');
-			if (profile.balance < buycost) return lib.reply(message, `You dont have enough money to buy that!`);
-			profile.balance -= buycost * amt;
-			buything();
-			await profile.save();
-			lib.reply(message, `Bought ${args[0]}! Your balance is now: \$${profile.balance}`);
-		}
-
-		if (!args.length) {
+		if (!args.length){
+			const embed = lib.embed()
+				.setTitle(`Town Agricultural Market ${lib.emoji.heart}`);
 			var text = [];
-			const embed = lib.embed().setTitle(`Town Agricultural Market ${lib.emoji.heart}`);
-			var allBought = true;
-			if (!profile.animals.chickens.building){
-				allBought = false;
-				text.push(`${lib.emoji.coop} Coop | ${costs.coop}`);
+			for (const star of lib.stardews.all){
+				var boughtMachine = `**NOT BOUGHT**${lib.emoji.redcheck}`;
+				const mId = lib.stardew[star].machineid;
+				if (profile[mId]) boughtMachine = `**BOUGHT**${lib.emoji.greencheck}`;
+				text.push(`[*${mId}*] ${lib.stardew[star].machine} | [${boughtMachine}]\nCost: \$${lib.stardew[star].machinecost}`)
 			}
-			if (!profile.animals.cows.building){
-				allBought = false;
-				text.push(`${lib.emoji.barn} Barn | ${costs.barn}`);
-			}
-			if (allBought) text = ['You have everything you need!'];
-			embed.setDescription(text);
+			embed.setDescription(text.join('\n\n'));
 			return message.channel.send(embed);
-		} else {
-			let item = args[0];
-			if (item == 'coop') runthrough(costs.coop, () => profile.animals.chickens.building = true);
-			else if (item == 'barn') runthrough(costs.barn, () => profile.animals.cows.building = true);
-			else return lib.reply(message,'We don\'t sell that here!');
+		}
+
+		const item = args.shift();
+		if (!item) return lib.reply(message,'Please provide an item!');
+
+
+		const runthrough = async (short) =>{
+			const mId = lib.stardew[short].machineid;
+			if (profile[mId]) return lib.reply(message,`You can't buy **${lib.stardew[short].machine}** more than once!`);
+			if (profile.balance >= lib.stardew[short].machinecost) {
+				profile[mId] = true;
+				await profile.save();
+				return lib.reply(message,`Successfully bought **${lib.stardew[short].machine}**!!`);
+			} else {
+				return lib.reply(message,`Couldn't buy **${lib.stardew[short].machine}**!`);
+			}
+		}
+
+		for (const star of lib.stardews.all){
+			const mId = lib.stardew[star].machineid;
+			if (item.toLowerCase() == mId) runthrough(star);
 		}
 	},
 };

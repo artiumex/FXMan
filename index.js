@@ -22,7 +22,6 @@ const lib = require('./lib.js');
 
 process.on("unhandledRejection", error => console.log(error));
 
-
 //express
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -182,12 +181,6 @@ client.login(config.token);
 
 client.on('ready', async () => {
     console.log('Online');
-		for (const guild of lib.testGuilds){
-			for (const slashcmd of client.slashcommands){
-				const slash = slashcmd[1];
-				client.api.applications(client.user.id).guilds(guild).commands.post({data: slash.data});
-			}
-		}
 });
 
 client.ws.on('INTERACTION_CREATE', async interaction => {
@@ -206,10 +199,13 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 	}
 	const command = client.slashcommands.get(interaction.data.name);
 	var args = interaction.data.options;
-	
+	var self;
+	if (!interaction.member) self = interaction.user;
+	else self = interaction.member.user;
+
 	if(!command) return respond('oops!');
-	command.execute(client, interaction, args, respond, followup, lib);
-})
+	command.execute(client, interaction, self, args, respond, followup, lib);
+});
 
 client.on('message', message => {
 	if (!message.content.startsWith(config.prefix) || message.author.bot) return;

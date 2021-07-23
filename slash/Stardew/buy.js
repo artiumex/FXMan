@@ -1,82 +1,57 @@
+const LIB = require('../../lib.js');
+
 const data = {
   "name": "buy",
-  "description": "Buys goods from Pierre!",
+  "description": "Buys something from the Town Agricultural Market",
   "options": [
     {
       "type": 3,
       "name": "item",
-      "description": "The item to buy.",
+      "description": "Item you want to buy",
       "required": true,
-      "choices": [
-        {
-          "name": "parsnips",
-          "value": "parsnips"
-        },
-        {
-          "name": "wheat",
-          "value": "wheat"
-        },
-        {
-          "name": "corn",
-          "value": "corn"
-        },
-        {
-          "name": "beets",
-          "value": "beets"
-        },
-        {
-          "name": "grapes",
-          "value": "grapes"
-        },
-        {
-          "name": "hay",
-          "value": "hay"
-        },
-      ]
+      "choices": []
     },
     {
       "type": 4,
       "name": "amount",
-      "description": "The amount of goods to sell",
+      "description": "Amount of items to buy",
       "required": true
     }
   ]
 }
 
+for (const i of LIB.stardews.all){
+	const item = LIB.stardew[i];
+	const option = {
+		"name": item.baseid,
+		"value": item.baseid
+	}
+	data.options[0].choices.push(option);
+}
+
 module.exports = {
 	name: data.name,
 	data: data,
-	async execute(client, interaction, args, respond, followup, lib) {
-		const [item, amount] = args;
-		respond(interaction, `Attempting to buy ${amount.value} ${item.value}(s)`);
-		const profile = await lib.checkProf(interaction.member.user.id);
-		
-		const runthrough = async (buycost, buything) => {
-			let amt = amount.value;
-			if (0 > amt || (buycost * amt) > profile.balance) amt = Math.floor(profile.balance / buycost);
-			profile.balance -= buycost * amt;
-			buything(amt);
-			await profile.save();
-			followup(interaction, `Bought ${amt} ${item.value}! Your balance is now: \$${profile.balance}`);
+	async execute(client, interaction, self, args, respond, followup, lib) {
+		respond(interaction, `Buying items....`);
+		const profile = await lib.checkProf(self.id);
+		const embed = lib.embed();
+
+		var amount = args[1].value;
+
+		for (const i of lib.stardews.all){
+			const item = lib.stardew[i]
+			if (args[0].value == item.baseid){
+				if (amount < 1) amount = Math.floor(profile.balance / item.basecost);
+				if (profile.balance >= (amount * item.basecost)){
+					profile.balace -= (amount * item.basecost);
+					profile[item.baseid].amount += amount;
+					embed.setDescription(`Bought ${amount} ${item.base}! You now have ${amount} ${item.baseemoji} and \$${profile.balance}!`);
+				} else embed.setDescription(`Could not buy ${item.base}!\nYou have ${profile[item.baseid].amount} ${item.baseemoji} and \$${profile.balance}!`);
+			}
 		}
 
-		if (item.value == 'parsnips') runthrough(
-			20, (amount) => profile.farm.parsnips.seeds += amount
-		);
-		else if (item.value == 'wheat') runthrough(
-			10, (amount) => profile.farm.wheat.seeds += amount
-		);
-		else if (item.value == 'corn') runthrough(
-			25, (amount) => profile.farm.corn.seeds += amount
-		);
-		else if (item.value == 'beets') runthrough(
-			20, (amount) => profile.farm.corn.seeds += amount
-		);
-		else if (item.value == 'grapes') runthrough(
-			60, (amount) => profile.farm.grapes.seeds += amount
-		);
-		else if (item.value == 'hay') runthrough(
-			50, (amount) => profile.feed += amount
-		);
+		await profile.save();
+		followup(interaction,embed,true);
 	},
 };

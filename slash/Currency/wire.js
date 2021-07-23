@@ -17,15 +17,12 @@ const data = {
   ]
 }
 
-const { MessageEmbed } = require('discord.js');
-
 module.exports = {
 	name: data.name,
 	data: data,
-	async execute(client, interaction, args, respond, followup, lib) {
+	async execute(client, interaction, self, args, respond, followup, lib) {
 		respond(interaction, `Fetching and updating balances....`);
 		const [ mentioned, amount ] = args;
-		const self = interaction.member.user;
 		const them = await client.users.cache.get(mentioned.value);
 
 		const selfprofile = await lib.checkProf(self.id);

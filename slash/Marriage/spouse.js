@@ -11,14 +11,12 @@ const data = {
   ]
 }
 
-const {MessageEmbed} = require('discord.js');
-
 module.exports = {
 	name: data.name,
 	data: data,
-	async execute(client, interaction, args, respond, followup, lib) {
+	async execute(client, interaction, self, args, respond, followup, lib) {
 		respond(interaction, `Fetching official documents....`);
-		let mentioned = interaction.member.user;
+		let mentioned = self;
 		if (args) mentioned = await client.users.cache.get(args[0].value);
 
 		if (mentioned.bot && mentioned.id !== lib.botid) return followup(interaction, lib.responses.isbot);
