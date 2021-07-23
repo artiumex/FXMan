@@ -213,7 +213,7 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 
 client.on('message', message => {
 	if (!message.content.startsWith(config.prefix) || message.author.bot || message.channel.type === 'dm') return;
-	if(config.bannedUsers.includes(self.id)) return message.channel.send(`no ${lib.emoji.heart}`);
+	if(config.bannedUsers.includes(message.author.id)) return message.channel.send(`no ${lib.emoji.heart}`);
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/);
 	const cmd = args.shift().toLowerCase();
