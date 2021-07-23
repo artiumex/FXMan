@@ -96,7 +96,7 @@ module.exports = {
 						profile[item.artisanid] -= amount;
 						profile.balance += item.artisanprice * amount;
 						text.push(`Sold ${amount} ${item.artisan}! You now have ${profile[item.artisanid]} ${item.artisanemoji} and \$${profile.balance}!`);
-					} else text.push(`Could not sell ${item.artisan}!\nItem Amount: ${profile[item.artisanid]} ${item.artisanemoji}`);
+					} else text.push(`Could not sell ${item.artisan}! Item Amount: ${profile[item.artisanid]} ${item.artisanemoji}`);
 				}
 			}
 		}
