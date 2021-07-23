@@ -44,7 +44,7 @@ module.exports = {
 			if (args[0].value == item.baseid){
 				if (amount < 1) amount = Math.floor(profile.balance / item.basecost);
 				if (profile.balance >= (amount * item.basecost)){
-					profile.balace -= (amount * item.basecost);
+					profile.balance -= (amount * item.basecost);
 					profile[item.baseid].amount += amount;
 					embed.setDescription(`Bought ${amount} ${item.base}! You now have ${amount} ${item.baseemoji} and \$${profile.balance}!`);
 				} else embed.setDescription(`Could not buy ${item.base}!\nYou have ${profile[item.baseid].amount} ${item.baseemoji} and \$${profile.balance}!`);

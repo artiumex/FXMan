@@ -12,7 +12,7 @@ module.exports = {
 			for (const star of lib.stardews.all){
 				var boughtMachine = `**NOT BOUGHT**${lib.emoji.redcheck}`;
 				const mId = lib.stardew[star].machineid;
-				if (profile[mId]) boughtMachine = `**BOUGHT**${lib.emoji.greencheck}`;
+				if (profile[mId].unlocked) boughtMachine = `**BOUGHT**${lib.emoji.greencheck}`;
 				text.push(`[*${mId}*] ${lib.stardew[star].machine} | [${boughtMachine}]\nCost: \$${lib.stardew[star].machinecost}`)
 			}
 			embed.setDescription(text.join('\n\n'));
@@ -25,9 +25,9 @@ module.exports = {
 
 		const runthrough = async (short) =>{
 			const mId = lib.stardew[short].machineid;
-			if (profile[mId]) return lib.reply(message,`You can't buy **${lib.stardew[short].machine}** more than once!`);
+			if (profile[mId].unlocked) return lib.reply(message,`You can't buy **${lib.stardew[short].machine}** more than once!`);
 			if (profile.balance >= lib.stardew[short].machinecost) {
-				profile[mId] = true;
+				profile[mId].unlocked = true;
 				await profile.save();
 				return lib.reply(message,`Successfully bought **${lib.stardew[short].machine}**!!`);
 			} else {
