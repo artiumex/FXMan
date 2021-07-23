@@ -114,9 +114,11 @@ app.post('/removed', async function (req, res) {
     res.redirect('/buttons');
 });
 
-/*app.listen(3000, function(err){
-  console.log('App listening on http://localhost:3000');
-});*/
+if (!config.dev){
+	app.listen(3000, function(err){
+		console.log('App listening on http://localhost:3000');
+	});
+}
 
 
 
@@ -202,13 +204,16 @@ client.ws.on('INTERACTION_CREATE', async interaction => {
 	var self;
 	if (!interaction.member) self = interaction.user;
 	else self = interaction.member.user;
-
-	if(!command) return respond('oops!');
+	
+	if(config.bannedUsers.includes(self.id)) return respond(interction,`no ${lib.emoji.heart}`);
+	if(!command) return respond(interaction,'oops!');
+	
 	command.execute(client, interaction, self, args, respond, followup, lib);
 });
 
 client.on('message', message => {
-	if (!message.content.startsWith(config.prefix) || message.author.bot) return;
+	if (!message.content.startsWith(config.prefix) || message.author.bot || message.channel.type === 'dm') return;
+	if(config.bannedUsers.includes(self.id)) return message.channel.send(`no ${lib.emoji.heart}`);
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/);
 	const cmd = args.shift().toLowerCase();

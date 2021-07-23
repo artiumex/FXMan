@@ -21,7 +21,8 @@ module.exports = {
 
 		const profile = await lib.checkProf(mentioned.id);
 		const embed = lib.embed()
-			.setTitle(`**${mentioned.username}'s** Farm ${lib.emoji.heart}`);
+			.setTitle(`**${mentioned.username}'s** Farm ${lib.emoji.heart}`)
+			.setTimestamp();
 		var itemtext = [], arttext = [], silotext = [], invtext = [];
 
 		for (const all of lib.stardews.all){
@@ -39,8 +40,8 @@ module.exports = {
 		} 
 		if (itemtext.length) embed.addField(`${lib.emoji.farm} **Farm**`,itemtext.join('\n'));
 		if (arttext.length) embed.addField(`${lib.emoji.shed} **Shed**`,arttext.join('\n'));
-		if (silotext.length) embed.addField(`${lib.emoji.silo} **Silo**`,silotext.join('\n'));
-		if (invtext.length) embed.addField(`${lib.emoji.inventory} **Inventory**`,invtext.join('\n'));
+		if (silotext.length) embed.addField(`${lib.emoji.silo} **Silo**`,silotext.join('\n'), true );
+		if (invtext.length) embed.addField(`${lib.emoji.inventory} **Inventory**`,invtext.join('\n'), true );
 		followup(interaction,embed,true);
 	},
 };
