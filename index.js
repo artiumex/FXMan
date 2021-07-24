@@ -30,88 +30,88 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', async function (req, res) {
-    var connected = true;
-    if (!connection) connected = false;
+	var connected = true;
+	if (!connection) connected = false;
 
-    res.render('index', {
-        connected: connected,
-        buttons: await sbtns.find({}).sort({ name: -1 }),
-    });
+	res.render('index', {
+			connected: connected,
+			buttons: await sbtns.find({}).sort({ name: -1 }),
+	});
 });
 
 app.get('/loud', async function (req, res) {
-    var connected = true;
-    if (!connection) connected = false;
+	var connected = true;
+	if (!connection) connected = false;
 
-    res.render('loud', {
-        connected: connected,
-        buttons: await sbtns.find({}).sort({ name: -1 }),
-    });
+	res.render('loud', {
+			connected: connected,
+			buttons: await sbtns.find({}).sort({ name: -1 }),
+	});
 });
 
 app.get('/tts', function (req, res) {
-    var connected = true;
-    if (!connection) connected = false;
+	var connected = true;
+	if (!connection) connected = false;
 
-    res.render('tts', {
-        connected: connected,
-        prefix: config.prefix,
-    });
+	res.render('tts', {
+			connected: connected,
+			prefix: config.prefix,
+	});
 });
 
 app.get('/buttons', async function (req, res) {
-    res.render('buttons', {
-        buttons: await sbtns.find({}).sort({ name: -1 }),
-    });
+	res.render('buttons', {
+			buttons: await sbtns.find({}).sort({ name: -1 }),
+	});
 });
 
 app.post('/submitted', async function (req, res) {
-    var snd = await sbtns.findOne({
-        name: req.body.button
-    });
-    uniPlay(snd.link, 0.5, false);
-    res.redirect('/');
+	var snd = await sbtns.findOne({
+			name: req.body.button
+	});
+	uniPlay(snd.link, 0.5, false);
+	res.redirect('/');
 });
 
 app.post('/louded', async function (req, res) {
-    var snd = await sbtns.findOne({
-        name: req.body.button
-    });
-    uniPlay(snd.link, 1, false);
-    res.redirect('/loud');
+	var snd = await sbtns.findOne({
+			name: req.body.button
+	});
+	uniPlay(snd.link, 1, false);
+	res.redirect('/loud');
 });
 
 app.post('/ttsed', function (req, res) {
-    var textToSay = req.body.ttstext;
-    uniPlay(textToSay, 0.5, true);
-    res.redirect('/tts');
+	var textToSay = req.body.ttstext;
+	uniPlay(textToSay, 0.5, true);
+	res.redirect('/tts');
 });
 
 app.post('/added', async function (req, res) {
-    console.log(req.body);
-    const newBtn = await new sbtns({
-        _id: mongoose.Types.ObjectId(),
-        name: req.body.buttonname,
-        link: req.body.buttonlink,
-    })
-    try {
-        await newBtn.save();
-    } catch (err) {
-        console.log(err);
-    }
-    res.redirect('/buttons');
+	console.log(req.body);
+	const newBtn = await new sbtns({
+			_id: mongoose.Types.ObjectId(),
+			name: req.body.buttonname,
+			link: req.body.buttonlink,
+	})
+	try {
+			await newBtn.save();
+	} catch (err) {
+			console.log(err);
+	}
+	res.redirect('/buttons');
 });
 
 app.post('/removed', async function (req, res) {
-    console.log(req.body);
-    try {
-        await sbtns.findOneAndDelete({
-            name: req.body.buttonchoice,
-        });
-    } catch (err) {
-        console.log(err);
-    }
-    res.redirect('/buttons');
+	console.log(req.body);
+	try {
+			await sbtns.findOneAndDelete({
+					name: req.body.buttonchoice,
+			});
+	} catch (err) {
+			console.log(err);
+	}
+	res.redirect('/buttons');
 });
 
 if (!config.dev){
@@ -126,27 +126,27 @@ if (!config.dev){
 
 //mongoose
 const dbOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    autoIndex: false,
-    poolSize: 5,
-    connectTimeoutMS: 10000,
-    family: 4
-  };
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	autoIndex: false,
+	poolSize: 5,
+	connectTimeoutMS: 10000,
+	family: 4
+};
 
-  mongoose.connect(config.mongodb, dbOptions);
-  mongoose.set('useFindAndModify', false);
-  mongoose.Promise = global.Promise;
+mongoose.connect(config.mongodb, dbOptions);
+mongoose.set('useFindAndModify', false);
+mongoose.Promise = global.Promise;
 
-  mongoose.connection.on('connected', () => {
-    console.log(`The bot has connected to the database.`);
-  });
-  mongoose.connection.on('disconnected', () => {
-    console.log(`The bot has disconnected from the database.`);
-  });
-  mongoose.connection.on('err', (err) => {
-    console.log(`There was an error with the connection to the databse:  ${err}`);
-  });
+mongoose.connection.on('connected', () => {
+	console.log(`The bot has connected to the database.`);
+});
+mongoose.connection.on('disconnected', () => {
+	console.log(`The bot has disconnected from the database.`);
+});
+mongoose.connection.on('err', (err) => {
+	console.log(`There was an error with the connection to the databse:  ${err}`);
+});
 
 
 
@@ -167,7 +167,6 @@ for (const folder of lcommandFolders) {
 		client.legacycommands.set(command.name, command);
 	}
 }
-
 
 for (const folder of scommandFolders) {
 	const scommandFiles = fs.readdirSync(`./slash/${folder}`).filter(file => file.endsWith('.js'));

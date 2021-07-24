@@ -74,6 +74,7 @@ module.exports = {
 				if (trueitem == item.productid){
 					if (lib.time(profile[item.baseid].collect,item.producttime)){
 						profile[item.productid] += profile[item.baseid].amount;
+						profile[item.baseid].amount = 0;
 						profile[item.baseid].collect = new Date();
 						text.push(`Collected ${profile[item.productid]} ${item.product}! You now have ${profile[item.productid]} ${item.productemoji}!`);
 					} else text.push(`Could not collect ${item.base}!`);
