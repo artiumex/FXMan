@@ -43,8 +43,8 @@ module.exports = {
 		var text = [];
 		for (const i of lib.stardews.all){
 			const item = lib.stardew[i];
-			amount = profile[item.productid];
 			for (const trueitem of items){
+				amount = profile[item.productid];
 				if (trueitem == item.artisanid){
 					if (profile[item.productid] > 0){
 						profile[item.productid] -= amount;

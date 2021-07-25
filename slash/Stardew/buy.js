@@ -46,6 +46,7 @@ module.exports = {
 				if (profile.balance >= (amount * item.basecost)){
 					profile.balance -= (amount * item.basecost);
 					profile[item.baseid].amount += amount;
+					profile[item.baseid].collect = new Date();
 					embed.setDescription(`Bought ${amount} ${item.base}! You now have ${profile[item.baseid].amount} ${item.baseemoji} and \$${profile.balance}!`);
 				} else embed.setDescription(`Could not buy ${item.base}!\nYou have ${profile[item.baseid].amount} ${item.baseemoji} and \$${profile.balance}!`);
 			}
