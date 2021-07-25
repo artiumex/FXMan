@@ -19,13 +19,13 @@ module.exports = {
 		}
 	},
 	emoji: {
-		heart: ':heart:',
+		heart: '<a:Heart:868688228838953003>',
 		redcheck: ':x:',
 		greencheck: ':white_check_mark:',
 		hay: '',
 		fertilizer: '',
 		farm: '<:ShippingBox:865563927785635840>',
-		shed: '<:Big_Shed:868153384409120858>',
+		shed: '<a:shed:868657049532268615>',
 		silo: '<:Silo:865563929845825566>',
 		inventory: '<:Backpack:866144836545544192>',
 	},
